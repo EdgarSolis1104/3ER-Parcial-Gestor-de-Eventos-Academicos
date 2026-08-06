@@ -15,6 +15,32 @@ const loginButton = document.getElementById('loginButton');
 const resultadoDiv = document.getElementById('resultado');
 const calendarBotones = document.getElementById('calendarBotones');
 
+   const tokenGuardado = localStorage.getItem('accessToken');
+    if (tokenGuardado) {
+      AppState.accessToken = tokenGuardado;
+      calendarBotones.style.display = 'block';
+}
+  fetch('https://www.googleapis.com/oauth2/v1/userinfo?alt=json', {
+    headers: { 'Authorization': `Bearer ${tokenGuardado}` }
+  })
+    .then(res => {
+      if (!res.ok) throw new Error('Token expirado');
+      return res.json();
+    })
+    .then(data => {
+      resultadoDiv.style.display = 'block';
+      resultadoDiv.innerHTML = `
+        <img src="${data.picture}" alt="avatar">
+        <strong>${data.name}</strong><br>
+        ${data.email}
+      `;
+    })
+    .catch(() => {
+      localStorage.removeItem('accessToken');
+      AppState.accessToken = null;
+      calendarBotones.style.display = 'none';
+    });
+
 loginButton.addEventListener('click', () => {
   google.accounts.oauth2.initTokenClient({
     client_id: CLIENT_ID,
@@ -25,6 +51,7 @@ loginButton.addEventListener('click', () => {
         resultadoDiv.innerHTML = `<p>Error: ${response.error}</p>`;
       } else {
         AppState.accessToken = response.access_token;
+        localStorage.setItem('accessToken', response.access_token);
 
         fetch('https://www.googleapis.com/oauth2/v1/userinfo?alt=json', {
           headers: {
