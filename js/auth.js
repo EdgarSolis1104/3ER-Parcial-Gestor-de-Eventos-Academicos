@@ -71,11 +71,19 @@ loginButton.addEventListener('click', () => {
 
           // Ya que hay token, mostramos los botones de Calendar
           calendarBotones.style.display = 'block';
+
+          // Login exitoso -> listar eventos automáticamente
+          listarEventos()
+            .then(eventos => {
+              mostrarSalida('Eventos:\n' + JSON.stringify(eventos, null, 2));
+              renderizarEventos();
+            })
+            .catch(err => mostrarSalida('Error: ' + err));
           loginButton.style.display = 'none';
         });
       }
     },
-  }).requestAccessToken();
+  }).requestAccessToken({ prompt: 'consent' });
 });
 logoutBtn.addEventListener('click', () => {
   console.log('boton presionado');
