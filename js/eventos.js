@@ -3,18 +3,20 @@
 // --------------------------------------------
 const listaEventosEl = document.getElementById('listaEventos');
 
+
 function renderizarEventos() {
   const eventos = leerCache();
   listaEventosEl.innerHTML = '';
 
   if (eventos.length === 0) {
-    listaEventosEl.textContent = 'No hay eventos.';
+     listaEventosEl.textContent = 'No hay eventos.';
     return;
   }
 
   eventos.forEach(evento => {
     const item = document.createElement('div');
     item.className = 'evento-item';
+     
 
     const info = document.createElement('span');
     info.textContent = `${evento.titulo} — ${evento.fecha} ${evento.hora} (${evento.tipo})`;
@@ -33,6 +35,13 @@ function renderizarEventos() {
     listaEventosEl.appendChild(item);
   });
 }
+function limpiarEventos() {
+  localStorage.removeItem('gea_eventos_cache');
+  renderizarEventos();
+  salidaEl.style.display = 'none';
+  salidaEl.textContent = '';
+}
+
 
 function manejarEditar(evento) {
   const nuevoTitulo = prompt('Nuevo título del evento:', evento.titulo);
@@ -58,5 +67,12 @@ function manejarEliminar(evento) {
     .catch(err => mostrarSalida('Error: ' + err));
 }
 
-// Cache-first: pinta lo que ya haya guardado, sin esperar al fetch
-document.addEventListener('DOMContentLoaded', renderizarEventos);
+function alIniciarSesionExitosamente() {
+  // ... tu lógica de guardar token, mostrar UI post-login, etc.
+  renderizarEventos(); // aquí sí se pinta "No hay eventos." si aplica
+  
+} 
+
+document.addEventListener('DOMContentLoaded', () => {
+  listaEventosEl.innerHTML = ''; 
+});
