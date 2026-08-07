@@ -17,13 +17,15 @@
 
     <!-- Botones de prueba de Calendar, aparecen despues del login -->
     <div id="calendarBotones">
-        <button id="listarBtn">Listar eventos</button>
         <button id="crearBtn">Crear evento de prueba</button>
         <button id="logoutBtn">Cerrar sesión</button>
     </div>
 
-    <script src="config.example.js"></script>
-    <script src="auth.js"></script>
+    <!-- Aqui se pinta la lista de eventos con botones editar/eliminar -->
+    <div id="listaEventos"></div>
+
+    <!-- Aqui se muestra la respuesta cruda de la API -->
+    <pre id="salida"></pre>
 
     <p class="warn">Advertencia: Este ejemplo es solo para fines de demostración y esta sujeto a revisiones.</p>
 
@@ -32,10 +34,10 @@
 
     <!-- Configuración local con el Client ID (no se sube al repo) -->
     <script src="config.js"></script>
-
-
+    
     <!-- Módulos de la app -->
     <script src="js/auth.js"></script>
     <script src="js/calendar.js"></script>
+    <script src="js/eventos.js"></script>
 </body>
 </html>
