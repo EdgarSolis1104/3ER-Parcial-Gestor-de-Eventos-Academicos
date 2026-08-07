@@ -110,10 +110,28 @@ function crearEvento(nuevoEvento) {
 }
 
 crearBtn.addEventListener('click', () => {
+  const titulo = prompt('Nombre del evento:');
+  if (titulo === null || titulo.trim() === '') return;
+
+  const descripcion = prompt('Descripción:') || '';
+
+  const fechaInicio = prompt('Fecha de inicio (YYYY-MM-DD):');
+  if (fechaInicio === null || fechaInicio.trim() === '') return;
+
+  const horaInicio = prompt('Hora de inicio (HH:MM):');
+  if (horaInicio === null || horaInicio.trim() === '') return;
+
+  const fechaFinal = prompt('Fecha final (YYYY-MM-DD):');
+  if (fechaFinal === null || fechaFinal.trim() === '') return;
+
+  const horaFinal = prompt('Hora final (HH:MM):');
+  if (horaFinal === null || horaFinal.trim() === '') return;
+
   const nuevoEvento = {
-    summary: "Evento de prueba desde VS Code",
-    start: { dateTime: "2026-08-02T10:00:00-05:00" },
-    end: { dateTime: "2026-08-02T11:00:00-05:00" },
+    summary: titulo,
+    description: descripcion,
+    start: { dateTime: `${fechaInicio}T${horaInicio}:00-05:00` },
+    end: { dateTime: `${fechaFinal}T${horaFinal}:00-05:00` },
     extendedProperties: {
       private: { tipo: "general" }
     }
