@@ -45,3 +45,50 @@ loginButton.addEventListener('click', () => {
     },
   }).requestAccessToken();
 });
+
+// ============================================
+// Logica de la pagina de LOGIN
+// ============================================
+
+function manejarCredencialGoogle(respuesta) {
+    const datos = decodificarJWT(respuesta.credential);
+
+    const sesion = {
+        nombre: datos.name,
+        correo: datos.email
+    };
+    localStorage.setItem('sesionActual', JSON.stringify(sesion));
+
+    window.location.href = 'events.html';
+}
+
+function decodificarJWT(token) {
+    const partes = token.split('.');
+    const payload = partes[1];
+
+    const texto = atob(payload.replace(/-/g, '+').replace(/_/g, '/'));
+
+    return JSON.parse(texto);
+}
+
+window.onload = function() {
+    google.accounts.id.initialize({
+        client_id: GOOGLE_CLIENT_ID,
+        callback: manejarCredencialGoogle
+    });
+
+    google.accounts.id.renderButton(
+        document.getElementById('googleButton'),
+        { theme: 'outline', size: 'large', width: 320 }
+    );
+};
+comprobarSesion();
+
+function comprobarSesion() {
+    const sesion = localStorage.getItem('sesionActual');
+
+    if (sesion) {
+        window.location.href = 'events.html';
+    }
+}
+
