@@ -83,7 +83,7 @@ loginButton.addEventListener('click', () => {
         });
       }
     },
-  }).requestAccessToken();
+  }).requestAccessToken({ prompt: 'consent' });
 });
 logoutBtn.addEventListener('click', () => {
   console.log('boton presionado');

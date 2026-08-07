@@ -68,8 +68,12 @@ function listarEventos() {
       'Authorization': `Bearer ${AppState.accessToken}`
     }
   })
-    .then(res => res.json())
-    .then(data => {
+    .then(res => res.json().then(data => ({ status: res.status, data })))
+    .then(({ status, data }) => {
+      if (status !== 200) {
+        console.log('ERROR DE GOOGLE (listar):', data);
+        throw new Error(JSON.stringify(data));
+      }
       const eventosEstandar = (data.items || []).map(mapearEventoAEstandar);
       guardarCache(eventosEstandar);
       return eventosEstandar;
@@ -93,8 +97,12 @@ function crearEvento(nuevoEvento) {
     },
     body: JSON.stringify(nuevoEvento)
   })
-    .then(res => res.json())
-    .then(data => {
+    .then(res => res.json().then(data => ({ status: res.status, data })))
+    .then(({ status, data }) => {
+      if (status !== 200) {
+        console.log('ERROR DE GOOGLE (crear):', data);
+        throw new Error(JSON.stringify(data));
+      }
       const eventoEstandar = mapearEventoAEstandar(data);
       actualizarEventoEnCache(eventoEstandar);
       return eventoEstandar;
@@ -136,8 +144,12 @@ function editarEvento(eventoId, cambios) {
     },
     body: JSON.stringify(cambios)
   })
-    .then(res => res.json())
-    .then(data => {
+    .then(res => res.json().then(data => ({ status: res.status, data })))
+    .then(({ status, data }) => {
+      if (status !== 200) {
+        console.log('ERROR DE GOOGLE (editar):', data);
+        throw new Error(JSON.stringify(data));
+      }
       const eventoEstandar = mapearEventoAEstandar(data);
       actualizarEventoEnCache(eventoEstandar);
       return eventoEstandar;
