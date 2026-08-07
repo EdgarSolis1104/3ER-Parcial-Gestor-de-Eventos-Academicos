@@ -75,24 +75,52 @@ function eliminarEvento(indice) {
     mostrarEventos();
 }
 
+let tokenCliente = null;
+
 function agregarACalendar(indice) {
+    localStorage.setItem('eventoACalendar', indice);
+
+    if (!tokenCliente) {
+        tokenCliente = google.accounts.oauth2.initTokenClient({
+            client_id: GOOGLE_CLIENT_ID,
+            scope: GOOGLE_SCOPES,
+            callback: crearEventoEnCalendar
+        });
+    }
+
+    tokenCliente.requestAccessToken();
+}
+
+function crearEventoEnCalendar(respuesta) {
+    const indice = Number(localStorage.getItem('eventoACalendar'));
     const evento = obtenerEventos()[indice];
 
-    const fechaIni = evento.fechaInicio.replace(/-/g, '');
-    const horaIni  = evento.horaInicio.replace(/:/g, '') + '00';
-    const fechaFin = evento.fechaFin.replace(/-/g, '');
-    const horaFin  = evento.horaFin.replace(/:/g, '') + '00';
+    const datosEvento = {
+        summary: evento.titulo,
+        location: evento.localizacion || evento.tipo,
+        description: evento.descripcion || '',
+        start: { dateTime: evento.fechaInicio + 'T' + evento.horaInicio + ':00' },
+        end:   { dateTime: evento.fechaFin    + 'T' + evento.horaFin    + ':00' }
+    };
 
-    const inicio = fechaIni + 'T' + horaIni;
-    const fin    = fechaFin + 'T' + horaFin;
-
-    const url = 'https://calendar.google.com/calendar/render?action=TEMPLATE' +
-        '&text='     + encodeURIComponent(evento.titulo) +
-        '&dates='    + inicio + '/' + fin +
-        '&details='  + encodeURIComponent(evento.descripcion || '') +
-        '&location=' + encodeURIComponent(evento.localizacion || evento.tipo);
-
-    window.open(url, '_blank');
+    fetch('https://www.googleapis.com/calendar/v3/calendars/primary/events', {
+        method: 'POST',
+        headers: {
+            'Authorization': 'Bearer ' + respuesta.access_token,
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(datosEvento)
+    })
+    .then(function(respuestaServidor) {
+        return respuestaServidor.json();
+    })
+    .then(function(datos) {
+        if (datos.id) {
+            alert('Evento creado en tu calendario: ' + datos.htmlLink);
+        } else {
+            alert('Error: ' + datos.error.message);
+        }
+    });
 }
 
 // ============================================
