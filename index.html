@@ -15,15 +15,27 @@
             <h1 class="titulo">Iniciar Sesion</h1>
             <p class="subtitulo">Usa tu cuenta Google para acceder a tu calendario y datos</p>
 
-            <div id="googleButton"></div>
-
-            <div id="mensaje"></div>
-
-        </div>
+    <!-- Botones de prueba de Calendar, aparecen despues del login -->
+    <div id="calendarBotones">
+        <button id="listarBtn">Listar eventos</button>
+        <button id="crearBtn">Crear evento de prueba</button>
+        <button id="logoutBtn">Cerrar sesión</button>
     </div>
 
     <script src="config.example.js"></script>
     <script src="auth.js"></script>
 
+    <p class="warn">Advertencia: Este ejemplo es solo para fines de demostración y esta sujeto a revisiones.</p>
+
+    <!-- Librería de Google Identity Services -->
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
+
+    <!-- Configuración local con el Client ID (no se sube al repo) -->
+    <script src="config.js"></script>
+
+
+    <!-- Módulos de la app -->
+    <script src="js/auth.js"></script>
+    <script src="js/calendar.js"></script>
 </body>
 </html>
