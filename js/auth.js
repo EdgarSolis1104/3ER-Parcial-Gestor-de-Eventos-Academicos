@@ -21,29 +21,39 @@ const logoutBtn = document.getElementById('logoutBtn');
       AppState.accessToken = tokenGuardado;
       calendarBotones.style.display = 'block';
       loginButton.style.display = 'none';
-}
-  fetch('https://www.googleapis.com/oauth2/v1/userinfo?alt=json', {
-    headers: { 'Authorization': `Bearer ${tokenGuardado}` }
-  })
-    .then(res => {
-      if (!res.ok) throw new Error('Token expirado');
-      return res.json();
-    })
-    .then(data => {
-      resultadoDiv.style.display = 'block';
-      resultadoDiv.innerHTML = `
-        <img src="${data.picture}" alt="avatar">
-        <strong>${data.name}</strong><br>
-        ${data.email}
-      `;
-      calendarBotones.style.display = 'block';
-      loginButton.style.display = 'none';
-    })
-    .catch(() => {
-      localStorage.removeItem('accessToken');
-      AppState.accessToken = null;
-      calendarBotones.style.display = 'none';
-    });
+
+      fetch('https://www.googleapis.com/oauth2/v1/userinfo?alt=json', {
+        headers: { 'Authorization': `Bearer ${tokenGuardado}` }
+      })
+        .then(res => {
+          if (!res.ok) throw new Error('Token expirado');
+          return res.json();
+        })
+        .then(data => {
+          resultadoDiv.style.display = 'block';
+          resultadoDiv.innerHTML = `
+            <img src="${data.picture}" alt="avatar">
+            <strong>${data.name}</strong><br>
+            ${data.email}
+          `;
+          calendarBotones.style.display = 'block';
+          loginButton.style.display = 'none';
+
+          // Ya había sesión guardada -> pintamos eventos aquí también
+          listarEventos()
+            .then(eventos => {
+              mostrarSalida('Eventos:\n' + JSON.stringify(eventos, null, 2));
+              renderizarEventos();
+            })
+            .catch(err => mostrarSalida('Error: ' + err));
+        })
+        .catch(() => {
+          localStorage.removeItem('accessToken');
+          AppState.accessToken = null;
+          calendarBotones.style.display = 'none';
+          loginButton.style.display = 'block';
+        });
+    }
 
 loginButton.addEventListener('click', () => {
   google.accounts.oauth2.initTokenClient({
@@ -85,6 +95,7 @@ loginButton.addEventListener('click', () => {
     },
   }).requestAccessToken({ prompt: 'consent' });
 });
+
 logoutBtn.addEventListener('click', () => {
   console.log('boton presionado');
   
@@ -106,6 +117,9 @@ logoutBtn.addEventListener('click', () => {
     resultadoDiv.innerHTML = '';
     calendarBotones.style.display = 'none';
     loginButton.style.display = 'block';
-    console.log('listo, todo limpio');
+
+    limpiarEventos(); // limpia los eventos guardados 
+
+    console.log('ok');
   });
 });
