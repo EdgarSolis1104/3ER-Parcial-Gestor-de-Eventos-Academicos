@@ -94,3 +94,81 @@ function agregarACalendar(indice) {
 
     window.open(url, '_blank');
 }
+
+// ============================================
+// Logica del formulario de CREAR EVENTO
+// ============================================
+
+comprobarSesion();
+
+function comprobarSesion() {
+    const sesion = localStorage.getItem('sesionActual');
+
+    if (!sesion) {
+        window.location.href = 'index.html';
+    }
+}
+
+function obtenerEventos() {
+    const datos = localStorage.getItem('eventos');
+    return datos ? JSON.parse(datos) : [];
+}
+
+function guardarEventos(eventos) {
+    localStorage.setItem('eventos', JSON.stringify(eventos));
+}
+
+const formEvento = document.getElementById('formEvento');
+
+if (formEvento) {
+    formEvento.addEventListener('submit', function(e) {
+        e.preventDefault();
+
+        const titulo       = document.getElementById('titulo').value.trim();
+        const fechaInicio  = document.getElementById('fechaInicio').value.trim();
+        const fechaFin     = document.getElementById('fechaFin').value.trim();
+        const horaInicio   = document.getElementById('horaInicio').value.trim();
+        const horaFin      = document.getElementById('horaFin').value.trim();
+        const localizacion = document.getElementById('localizacion').value.trim();
+        const descripcion  = document.getElementById('descripcion').value.trim();
+        const tipo         = document.getElementById('tipo').value;
+        const mensaje      = document.getElementById('mensaje');
+
+        if (!titulo || !fechaInicio || !fechaFin || !horaInicio || !horaFin) {
+            mostrarMensaje(mensaje, 'Titulo, fechas y horas son obligatorios.', 'error');
+            return;
+        }
+
+        if (fechaFin < fechaInicio) {
+            mostrarMensaje(mensaje, 'La fecha de finalizacion no puede ser antes que la de inicio.', 'error');
+            return;
+        }
+
+        const evento = {
+            titulo: titulo,
+            fechaInicio: fechaInicio,
+            fechaFin: fechaFin,
+            horaInicio: horaInicio,
+            horaFin: horaFin,
+            localizacion: localizacion,
+            descripcion: descripcion,
+            tipo: tipo
+        };
+
+        const eventos = obtenerEventos();
+        eventos.push(evento); 
+        guardarEventos(eventos);
+
+        mostrarMensaje(mensaje, 'Evento creado correctamente.', 'exito');
+
+        setTimeout(function() {
+            window.location.href = 'events.html';
+        }, 1000);
+    });
+}
+
+function mostrarMensaje(elemento, texto, tipo) {
+    elemento.textContent = texto;
+    elemento.className   = tipo;
+}
+
