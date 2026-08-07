@@ -14,11 +14,13 @@ const SCOPES = [
 const loginButton = document.getElementById('loginButton');
 const resultadoDiv = document.getElementById('resultado');
 const calendarBotones = document.getElementById('calendarBotones');
+const logoutBtn = document.getElementById('logoutBtn');
 
    const tokenGuardado = localStorage.getItem('accessToken');
     if (tokenGuardado) {
       AppState.accessToken = tokenGuardado;
       calendarBotones.style.display = 'block';
+      loginButton.style.display = 'none';
 }
   fetch('https://www.googleapis.com/oauth2/v1/userinfo?alt=json', {
     headers: { 'Authorization': `Bearer ${tokenGuardado}` }
@@ -34,6 +36,8 @@ const calendarBotones = document.getElementById('calendarBotones');
         <strong>${data.name}</strong><br>
         ${data.email}
       `;
+      calendarBotones.style.display = 'block';
+      loginButton.style.display = 'none';
     })
     .catch(() => {
       localStorage.removeItem('accessToken');
@@ -67,8 +71,33 @@ loginButton.addEventListener('click', () => {
 
           // Ya que hay token, mostramos los botones de Calendar
           calendarBotones.style.display = 'block';
+          loginButton.style.display = 'none';
         });
       }
     },
   }).requestAccessToken();
+});
+logoutBtn.addEventListener('click', () => {
+  console.log('boton presionado');
+  
+  const token = AppState.accessToken;
+  console.log('token es:', token);
+
+  if (!token) {
+    console.log('no hay token, saliendo');
+    return;
+  }
+
+  console.log('voy a llamar a revoke');
+
+  google.accounts.oauth2.revoke(token, () => {
+    console.log('revoke termino, limpiando todo');
+    localStorage.removeItem('accessToken');
+    AppState.accessToken = null;
+    resultadoDiv.style.display = 'none';
+    resultadoDiv.innerHTML = '';
+    calendarBotones.style.display = 'none';
+    loginButton.style.display = 'block';
+    console.log('listo, todo limpio');
+  });
 });
