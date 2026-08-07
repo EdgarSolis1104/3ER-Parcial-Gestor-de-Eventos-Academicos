@@ -4,14 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Prueba de login</title>
-    <style>  body { font-family: system-ui, sans-serif; max-width: 480px; margin: 60px auto; padding: 0 20px; }
-  button { padding: 10px 16px; font-size: 15px; cursor: pointer; margin-right: 8px; margin-top: 8px; }
-  #resultado { margin-top: 24px; padding: 16px; border: 1px solid #ddd; border-radius: 8px; display: none; }
-  #resultado img { border-radius: 50%; width: 48px; vertical-align: middle; margin-right: 12px; }
-  .warn { color: #b45309; font-size: 13px; margin-top: 20px; }
-  #calendarBotones { display: none; margin-top: 16px; }
-  #salida { margin-top: 16px; white-space: pre-wrap; font-family: monospace; font-size: 12px; background: #f5f5f5; padding: 12px; border-radius: 8px; max-height: 300px; overflow-y: auto; display: none; }
-</style>
+    <link rel="stylesheet" href="css/estilos.css">
 </head>
 <body>
     <h2>Prueba de login</h2>
@@ -31,118 +24,14 @@
 
     <p class="warn">Advertencia: Este ejemplo es solo para fines de demostración y esta sujeto a revisiones.</p>
 
+    <!-- Librería de Google Identity Services -->
     <script src="https://accounts.google.com/gsi/client" async defer></script>
-    <script>
- 
-        const CLIENT_ID = "657708774079-2rkfa484q5dvbjirv73upkthmesdcm6g.apps.googleusercontent.com";
 
-          // Scopes mínimos necesarios para esta prueba
-  const SCOPES = [
-    "https://www.googleapis.com/auth/userinfo.profile",
-    "https://www.googleapis.com/auth/userinfo.email",
-    "https://www.googleapis.com/auth/calendar.events",
-    "https://www.googleapis.com/auth/spreadsheets"
-    ];
-    
-            const loginButton = document.getElementById('loginButton');
-            const resultadoDiv = document.getElementById('resultado');
-            const calendarBotones = document.getElementById('calendarBotones');
-            const listarBtn = document.getElementById('listarBtn');
-            const crearBtn = document.getElementById('crearBtn');
-            const salidaEl = document.getElementById('salida');
+    <!-- Configuración local con el Client ID (no se sube al repo) -->
+    <script src="config.js"></script>
 
-            // Guardamos el access_token aqui para reusarlo en los botones de Calendar
-            let accessToken = null;
-
-            function mostrarSalida(texto) {
-                salidaEl.style.display = 'block';
-                salidaEl.textContent = texto;
-            }
-    
-            loginButton.addEventListener('click', () => {
-                google.accounts.oauth2.initTokenClient({
-                    client_id: CLIENT_ID,
-                    scope: SCOPES.join(' '),
-                    callback: (response) => {
-                        if (response.error) {
-                            resultadoDiv.style.display = 'block';
-                            resultadoDiv.innerHTML = `<p>Error: ${response.error}</p>`;
-                        } else {
-                            accessToken = response.access_token;
-
-                            fetch('https://www.googleapis.com/oauth2/v1/userinfo?alt=json', {
-                                headers: {
-                                    'Authorization': `Bearer ${response.access_token}`
-                                }
-                            }).then(response => response.json()).then(data => {
-                                resultadoDiv.style.display = 'block';
-                                resultadoDiv.innerHTML = `
-                                    <img src="${data.picture}" alt="avatar">
-                                    <strong>${data.name}</strong><br>
-                                    ${data.email}
-                                `;
-
-                                // Ya que hay token, mostramos los botones de Calendar
-                                calendarBotones.style.display = 'block';
-                            });
-                        }
-                    },
-                }).requestAccessToken();
-            });
-
-            // --------------------------------------------
-            // LISTAR EVENTOS (GET)
-            // --------------------------------------------
-            listarBtn.addEventListener('click', () => {
-                if (!accessToken) {
-                    mostrarSalida('Primero haz login.');
-                    return;
-                }
-
-                fetch('https://www.googleapis.com/calendar/v3/calendars/primary/events', {
-                    method: 'GET',
-                    headers: {
-                        'Authorization': `Bearer ${accessToken}`
-                    }
-                })
-                    .then(res => res.json())
-                    .then(data => {
-                        mostrarSalida('Eventos:\n' + JSON.stringify(data.items, null, 2));
-                    })
-                    .catch(err => mostrarSalida('Error: ' + err));
-            });
-
-            // --------------------------------------------
-            // CREAR EVENTO DE PRUEBA (POST)
-            // --------------------------------------------
-            crearBtn.addEventListener('click', () => {
-                if (!accessToken) {
-                    mostrarSalida('Primero haz login.');
-                    return;
-                }
-
-                const nuevoEvento = {
-                    summary: "Evento de prueba desde VS Code",
-                    start: { dateTime: "2026-08-02T10:00:00-05:00" },
-                    end: { dateTime: "2026-08-02T11:00:00-05:00" }
-                };
-
-                fetch('https://www.googleapis.com/calendar/v3/calendars/primary/events', {
-                    method: 'POST',
-                    headers: {
-                        'Authorization': `Bearer ${accessToken}`,
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify(nuevoEvento)
-                })
-                    .then(res => res.json())
-                    .then(data => {
-                        mostrarSalida('Evento creado:\n' + JSON.stringify(data, null, 2));
-                    })
-                    .catch(err => mostrarSalida('Error: ' + err));
-            });
-            
-
-    </script>
+    <!-- Módulos de la app -->
+    <script src="js/auth.js"></script>
+    <script src="js/calendar.js"></script>
 </body>
 </html>
