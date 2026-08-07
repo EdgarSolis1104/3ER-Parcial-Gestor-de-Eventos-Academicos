@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Lista de Eventos</title>
+    <link rel="stylesheet" href="estilos.css">
+</head>
+<body>
+
+    <nav class="barra-navegacion">
+        <span class="logo">Eventos</span>
+        <span id="usuarioLogueado" class="nombre-usuario"></span>
+        <a class="btn-cerrar" href="index.html">Salir</a>
+    </nav>
+
+    <div class="contenedor-ancho">
+
+        <div class="cabecera-eventos">
+            <h1 class="titulo">Mis Eventos</h1>
+            <button class="btn" onclick="window.location.href='create-events.html'">
+                + Crear Evento
+            </button>
+        </div>
+
+        <div id="listaEventos" class="grid-eventos"></div>
+
+        <div id="sinEventos" class="mensaje-vacio">
+            Aun no hay eventos. Crea el primero.
+        </div>
+
+    </div>
+
+    <script src="eventos.js"></script>
+</body>
+</html>
