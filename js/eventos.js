@@ -37,7 +37,7 @@ function renderizarEventos() {
 }
 function limpiarEventos() {
   localStorage.removeItem('gea_eventos_cache');
-  renderizarEventos();
+  listaEventosEl.innerHTML = ''; // vacío y sin mensaje, no hay sesión activa
   salidaEl.style.display = 'none';
   salidaEl.textContent = '';
 }
