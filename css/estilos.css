@@ -6,6 +6,9 @@ button { padding: 10px 16px; font-size: 15px; cursor: pointer; margin-right: 8px
 #calendarBotones { display: none; margin-top: 16px; }
 #salida { margin-top: 16px; white-space: pre-wrap; font-family: monospace; font-size: 12px; background: #f5f5f5; padding: 12px; border-radius: 8px; max-height: 300px; overflow-y: auto; display: none; }
 
+/* ============================================
+   Estilos de la pagina de LOGIN
+   ============================================ */
 * {
     margin: 0;
     padding: 0;
@@ -19,10 +22,10 @@ body {
 }
 
 /* ============================================
-   FORMULARIOS (login y crear evento)
+   FORMULARIOS (login)
    ============================================ */
 
-.contenedor {
+.conteinar {
     display: flex;
     justify-content: center;
     align-items: center;
@@ -30,8 +33,8 @@ body {
     padding: 20px;
 }
 
-.caja-formulario {
-    background: white;
+.form-box {
+    background: #ced4da;
     width: 100%;
     max-width: 420px;
     padding: 40px 30px;
@@ -39,19 +42,38 @@ body {
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
 }
 
-.titulo {
+h2 {
     text-align: center;
     color: #2d1b4e;
     margin-bottom: 10px;
     font-size: 24px;
 }
 
-.subtitulo {
+p {
     text-align: center;
-    color: #777;
+    color: black;
     font-size: 14px;
     margin-bottom: 30px;
 }
+
+#loginButton {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+    margin: 20px auto 24px;
+    padding: 10px 16px;
+    background-color:  #fff;
+    color: #3c4043;
+    border: 1px solid #dadce0;
+    border-radius: 4px;
+    font-size: 14px;
+    cursor: pointer;
+}
+
+/* ============================================
+   FORMULARIOS (Crear Eventos)
+   ============================================ */
 
 label {
     display: block;

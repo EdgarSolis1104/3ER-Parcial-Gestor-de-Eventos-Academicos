@@ -3,31 +3,36 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
-    <link rel="stylesheet" href="estilos.css">
-    <script src="https://accounts.google.com/gsi/client" async defer></script>
+    <title>Prueba de login</title>
+    <link rel="stylesheet" href="css/estilos.css">
 </head>
 <body>
-    
-    <div class="contenedor">
-        <div class="caja-formulario">
 
-            <h1 class="titulo">Iniciar Sesion</h1>
-            <p class="subtitulo">Usa tu cuenta Google para acceder a tu calendario y datos</p>
+    <div class="conteinar">
+        <div class="form-box">
+            <h2><strong>INICIAR SESION</strong></h2>
+           
+            <button id="loginButton" class="google-btn">
+                <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google" width="18" height="18">
+                <span id="loginTexto"><strong>Login con Google</strong></span>
+            </button>
 
-    <!-- Botones de prueba de Calendar, aparecen despues del login -->
-    <div id="calendarBotones">
-        <button id="crearBtn">Crear evento de prueba</button>
-        <button id="logoutBtn">Cerrar sesión</button>
+             <p><strong>Usa tu cuenta Google para acceder a tu calendario y datos</strong></p>
+
+            <!-- Botones de prueba de Calendar, aparecen despues del login -->
+            <div id="calendarBotones">
+                <button id="crearBtn">Crear evento de prueba</button>
+                <button id="logoutBtn">Cerrar sesión</button>
+            </div>
+
+            <!-- Aqui se pinta la lista de eventos con botones editar/eliminar -->
+            <div id="listaEventos"></div>
+
+            <!-- Aqui se muestra la respuesta cruda de la API -->
+            <pre id="salida"></pre>
+
+        </div>
     </div>
-
-    <!-- Aqui se pinta la lista de eventos con botones editar/eliminar -->
-    <div id="listaEventos"></div>
-
-    <!-- Aqui se muestra la respuesta cruda de la API -->
-    <pre id="salida"></pre>
-
-    <p class="warn">Advertencia: Este ejemplo es solo para fines de demostración y esta sujeto a revisiones.</p>
 
     <!-- Librería de Google Identity Services -->
     <script src="https://accounts.google.com/gsi/client" async defer></script>
