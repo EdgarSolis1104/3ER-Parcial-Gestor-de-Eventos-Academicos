@@ -3,10 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Prueba de login</title>
+    <title>Mi gestor de eventos</title>
     <link rel="stylesheet" href="css/estilos.css">
 </head>
 <body>
+    <h1>Bienvenido</h1>
 
     <div class="conteinar">
         <div class="form-box">
@@ -34,6 +35,12 @@
         </div>
     </div>
 
+    <!-- Aqui se pinta la lista de eventos con botones editar/eliminar -->
+    <div id="listaEventos"></div>
+
+    <!-- Aqui se muestra la respuesta cruda de la API -->
+    <pre id="salida"></pre>
+
     <!-- Librería de Google Identity Services -->
     <script src="https://accounts.google.com/gsi/client" async defer></script>
 
@@ -44,5 +51,6 @@
     <script src="js/auth.js"></script>
     <script src="js/calendar.js"></script>
     <script src="js/eventos.js"></script>
+    <script src="js/ui.js"></script>
 </body>
 </html>
