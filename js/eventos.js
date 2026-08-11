@@ -3,6 +3,12 @@
 // --------------------------------------------
 const listaEventosEl = document.getElementById('listaEventos');
 
+const modalEliminar = document.getElementById('modalEliminar');
+const textoEventoAEliminar = document.getElementById('textoEventoAEliminar');
+const btnCancelarEliminar = document.getElementById('btnCancelarEliminar');
+const btnConfirmarEliminar = document.getElementById('btnConfirmarEliminar');
+let eventoAEliminar = null;
+
 
 function renderizarEventos() {
   const eventos = leerCache();
@@ -77,8 +83,20 @@ function manejarEditar(evento) {
 }
 
 function manejarEliminar(evento) {
-  const confirmar = confirm(`¿Eliminar "${evento.titulo}"?`);
-  if (!confirmar) return;
+  eventoAEliminar = evento;
+  textoEventoAEliminar.textContent = '"' + evento.titulo + '"';
+  modalEliminar.classList.add('abierto');
+}
+
+function cerrarModalEliminar() {
+  modalEliminar.classList.remove('abierto');
+  eventoAEliminar = null;
+}
+
+function confirmarEliminar() {
+  if (!eventoAEliminar) return;
+  const evento = eventoAEliminar;
+  cerrarModalEliminar();
 
   eliminarEvento(evento.id)
     .then(() => {
@@ -87,6 +105,12 @@ function manejarEliminar(evento) {
     })
     .catch(err => mostrarSalida('Error: ' + err));
 }
+
+btnCancelarEliminar.addEventListener('click', cerrarModalEliminar);
+btnConfirmarEliminar.addEventListener('click', confirmarEliminar);
+modalEliminar.addEventListener('click', (e) => {
+  if (e.target === modalEliminar) cerrarModalEliminar();
+});
 
 function alIniciarSesionExitosamente() {
   // ... tu lógica de guardar token, mostrar UI post-login, etc.

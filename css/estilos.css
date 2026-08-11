@@ -279,6 +279,28 @@ textarea {
     background: #cbd5e1;
 }
 
+.btn-eliminar {
+    background: #e74c3c;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: bold;
+    cursor: pointer;
+    padding: 12px 24px;
+    margin: 0;
+    align-items: center;
+}
+
+.btn-eliminar:hover {
+    background: #c0392b;
+}
+
+.modal-tarjeta p {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
 .btn-crear {
     width: auto;
     margin: 0;
