@@ -135,3 +135,4 @@ window.addEventListener('storage', (evento) => {
     mostrarPantallaLogin();
   }
 });
+
