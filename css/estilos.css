@@ -5,3 +5,797 @@ button { padding: 10px 16px; font-size: 15px; cursor: pointer; margin-right: 8px
 .warn { color: #b45309; font-size: 13px; margin-top: 20px; }
 #calendarBotones { display: none; margin-top: 16px; }
 #salida { margin-top: 16px; white-space: pre-wrap; font-family: monospace; font-size: 12px; background: #f5f5f5; padding: 12px; border-radius: 8px; max-height: 300px; overflow-y: auto; display: none; }
+
+/* ============================================
+   Estilos de la pagina de LOGIN
+   ============================================ */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: Arial, Helvetica, sans-serif;
+    background: #f0f2f5;
+    min-height: 100vh;
+}
+
+/* ============================================
+   FORMULARIOS (login)
+   ============================================ */
+
+.conteinar {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 50vh;
+    padding: 20px;
+}
+
+.form-box {
+    background: #ced4da;
+    width: clamp(350px, 90vw, 700px);
+    padding: 40px 30px;
+    border-radius: 15px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+}
+
+h1,h2 {
+    text-align: center;
+    color: #2d1b4e;
+    margin-bottom: 10px;
+    font-size: 24px;
+}
+
+h1 {
+    font-size: 60px;
+    width: auto;
+    display: auto;
+}
+p {
+    text-align: center;
+    color: black;
+    font-size: 14px;
+    margin-bottom: 30px;
+}
+
+#loginButton {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+    margin: 20px auto 24px;
+    padding: 10px 16px;
+    background-color:  #fff;
+    color: #3c4043;
+    border: 1px solid #dadce0;
+    border-radius: 4px;
+    font-size: 14px;
+    cursor: pointer;
+}
+
+/* ============================================
+   FORMULARIOS (Crear Eventos)
+   ============================================ */
+
+#crearBtn {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+    margin: 20px auto 24px;
+    padding: 10px 16px;
+    background: linear-gradient(135deg, #8b5cf6, #2d1b4e);
+    color: #ffffff;
+    border: none;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s;
+    box-shadow: 0 4px 12px rgba(139, 92, 246, 0.35);
+}
+
+#crearBtn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(139, 92, 246, 0.45);
+}
+
+#exportarBtn {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+    margin: 20px auto 24px;
+    padding: 10px 16px;
+    background: #188038;
+    color: #ffffff;
+    border: none;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s;
+    box-shadow: 0 4px 12px rgba(24, 128, 56, 0.35);
+}
+
+#exportarBtn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(24, 128, 56, 0.45);
+}
+
+label {
+    display: block;
+    margin-bottom: 5px;
+    color: #2d1b4e;
+    font-size: 14px;
+    font-weight: bold;
+}
+
+input[type="text"],
+input[type="date"],
+input[type="time"],
+select,
+textarea {
+    width: 100%;
+    padding: 12px 15px;
+    margin-bottom: 20px;
+    background: #ffffff;
+    border: 2px solid #e2e8f0;
+    border-radius: 10px;
+    font-size: 14px;
+    font-family: Arial, sans-serif;
+    color: #333333;
+    transition: border-color 0.3s, box-shadow 0.3s;
+}
+
+input:focus,
+select:focus,
+textarea:focus {
+    outline: none;
+    border-color: #8b5cf6;
+    box-shadow: 0 0 0 4px rgba(139, 92, 246, 0.15);
+}
+
+textarea {
+    resize: vertical;
+}
+
+.btn {
+    width: 100%;
+    padding: 14px;
+    background: linear-gradient(135deg, #8b5cf6, #2d1b4e);
+    color: white;
+    border: none;
+    border-radius: 10px;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+    box-shadow: 0 4px 12px rgba(139, 92, 246, 0.35);
+    transition: all 0.3s;
+}
+
+.btn:hover {
+    background: linear-gradient(135deg, #a78bfa, #8b5cf6);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(139, 92, 246, 0.45);
+}
+
+.texto-link {
+    text-align: center;
+    margin-top: 20px;
+    font-size: 14px;
+    color: #777;
+}
+
+.texto-link a {
+    color: #8b5cf6;
+    text-decoration: none;
+    font-weight: bold;
+}
+
+.texto-link a:hover {
+    text-decoration: underline;
+}
+
+#googleButton {
+    display: flex;
+    justify-content: center;
+}
+
+.fila-doble {
+    display: flex;
+    gap: 15px;
+    flex-wrap: wrap;
+}
+
+.fila-doble > div {
+    flex: 1;
+    min-width: 150px;
+}
+
+/* ============================================
+   MODAL CREAR EVENTO
+   ============================================ */
+
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.6);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    z-index: 1000;
+}
+
+.modal-overlay.abierto {
+    display: flex;
+}
+
+.modal-tarjeta {
+    background: #ffffff;
+    width: clamp(350px, 90vw, 520px);
+    max-height: 90vh;
+    overflow-y: auto;
+    border-radius: 15px;
+    padding: 30px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+}
+
+.modal-tarjeta h2 {
+    color: #2d1b4e;
+    font-size: 24px;
+    margin-bottom: 20px;
+}
+
+.botones-modal {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    margin-top: 10px;
+}
+
+.botones-modal button {
+    margin: 0;
+    padding: 12px 24px;
+}
+
+.btn-cancelar {
+    background: #e2e8f0;
+    color: #2d1b4e;
+    border: none;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.btn-cancelar:hover {
+    background: #cbd5e1;
+}
+
+.btn-eliminar {
+    background: #e74c3c;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: bold;
+    cursor: pointer;
+    padding: 12px 24px;
+    margin: 0;
+    align-items: center;
+}
+
+.btn-eliminar:hover {
+    background: #c0392b;
+}
+
+.modal-tarjeta p {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.btn-crear {
+    width: auto;
+    margin: 0;
+}
+
+/* ============================================
+   BARRA DE NAVEGACION
+   ============================================ */
+
+.barra-navegacion {
+    background: #2d1b4e;
+    color: white;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 40px;
+}
+
+.logo {
+    font-size: 20px;
+    font-weight: bold;
+}
+
+.nav-derecha {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+#avatarUsuario {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    border: 2px solid white;
+    display: none;
+}
+
+.nombre-usuario {
+    color: #c9a0dc;
+    font-size: 14px;
+}
+
+#logoutBtn {
+    display: none;
+    margin: 0;
+    color: white;
+    text-decoration: none;
+    background: #e74c3c;
+    padding: 8px 16px;
+    border: none;
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+#logoutBtn:hover {
+    background: #c0392b;
+}
+
+.btn-cerrar:hover {
+    background: #c0392b;
+}
+
+/* ============================================
+   LISTA DE EVENTOS COMO TARJETAS
+   ============================================ */
+
+#listaEventos {
+    width: 100%;
+    margin-top: 20px;
+}
+
+.evento-item {
+    background: white;
+    border-radius: 15px;
+    padding: 25px;
+    margin-bottom: 20px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    border-left: 5px solid #8b5cf6;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+    flex-wrap: wrap;
+}
+
+.evento-item span {
+    flex: 1;
+    color: #2d1b4e;
+    font-size: 15px;
+    line-height: 1.5;
+    font-weight: bold;
+}
+
+.evento-item button {
+    margin: 0;
+    padding: 8px 16px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 13px;
+    font-weight: bold;
+    color: white;
+    white-space: nowrap;
+}
+
+.evento-item button:nth-child(2) {
+    background: #4285F4;
+}
+
+.evento-item button:nth-child(2):hover {
+    background: #3367d6;
+}
+
+.evento-item button:nth-child(3) {
+    background: #e74c3c;
+}
+
+.evento-item button:nth-child(3):hover {
+    background: #c0392b;
+}
+
+/* ============================================
+   VISTA CALENDARIO (tipo Google Calendar)
+   ============================================ */
+
+#vistaCalendario {
+    margin-top: 20px;
+    background: white;
+    border-radius: 15px;
+    padding: 25px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+}
+
+.cabecera-calendario {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 15px;
+    flex-wrap: wrap;
+}
+
+.cabecera-calendario h3 {
+    color: #2d1b4e;
+    margin: 0;
+    flex: 1;
+    text-align: center;
+}
+
+.cabecera-calendario button {
+    background: #f0f2f5;
+    color: #2d1b4e;
+    border: none;
+    border-radius: 50%;
+    width: 36px;
+    height: 36px;
+    margin: 0;
+    font-size: 14px;
+    cursor: pointer;
+}
+
+.cabecera-calendario button:hover {
+    background: #e2e8f0;
+}
+
+#btnHoy {
+    border-radius: 8px !important;
+    width: auto !important;
+    padding: 0 12px;
+    font-weight: bold;
+}
+
+.vistas-botones {
+    display: flex;
+    gap: 6px;
+}
+
+.vistas-botones button {
+    border-radius: 8px !important;
+    width: auto !important;
+    height: auto !important;
+    padding: 8px 14px;
+    font-size: 13px;
+    font-weight: bold;
+}
+
+.vistas-botones button.activa {
+    background: #8b5cf6;
+    color: white;
+}
+
+.tabla-calendario {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.tabla-calendario th {
+    background: #2d1b4e;
+    color: white;
+    padding: 10px;
+    font-size: 12px;
+}
+
+.tabla-calendario td {
+    border: 1px solid #e2e8f0;
+    text-align: center;
+    padding: 12px;
+    height: 55px;
+    font-size: 14px;
+    color: #333;
+    vertical-align: middle;
+    cursor: pointer;
+}
+
+.tabla-calendario td:hover {
+    background: #f8f5ff;
+}
+
+.tabla-calendario td.dia-evento {
+    background: #f5f0ff;
+    color: #8b5cf6;
+    font-weight: bold;
+}
+
+.tabla-calendario td.dia-hoy {
+    outline: 2px solid #8b5cf6;
+}
+
+.tabla-calendario td.dia-seleccionado {
+    background: #e4d8ff;
+}
+
+.numero-dia {
+    display: inline-block;
+    padding: 6px;
+}
+
+.dia-hoy .numero-dia {
+    background: #8b5cf6;
+    color: white;
+    border-radius: 50%;
+}
+
+.vista-semana {
+    display: grid;
+    grid-template-columns: repeat(7, minmax(0, 1fr));
+    gap: 4px;
+}
+
+.columna-dia {
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    padding: 4px;
+    min-height: 180px;
+    min-width: 0;
+    background: #faf9ff;
+    overflow: hidden;
+}
+
+.columna-dia.dia-hoy {
+    border: 2px solid #8b5cf6;
+}
+
+.cabecera-dia {
+    font-weight: bold;
+    color: #2d1b4e;
+    font-size: 12px;
+    margin-bottom: 6px;
+    text-align: center;
+    overflow-wrap: break-word;
+}
+
+.mini-evento {
+    background: #8b5cf6;
+    color: white;
+    font-size: 11px;
+    padding: 3px 4px;
+    border-radius: 5px;
+    margin-bottom: 5px;
+    overflow-wrap: break-word;
+}
+
+.sin-eventos {
+    color: #aaa;
+    font-size: 11px;
+    text-align: center;
+    margin-top: 10px;
+}
+
+.vista-dia {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.evento-dia {
+    background: #f5f0ff;
+    border-left: 5px solid #8b5cf6;
+    padding: 15px;
+    border-radius: 10px;
+}
+
+.evento-dia strong {
+    color: #2d1b4e;
+}
+
+.evento-dia div {
+    color: #666;
+    font-size: 13px;
+    margin-top: 4px;
+}
+
+/* ============================================
+   MENSAJES (exito / error)
+   ============================================ */
+
+#mensaje {
+    margin-top: 15px;
+    padding: 12px;
+    border-radius: 8px;
+    text-align: center;
+    font-size: 14px;
+    display: none;
+}
+
+#mensaje.exito {
+    display: block;
+    background: #d4edda;
+    color: #155724;
+    border: 1px solid #c3e6cb;
+}
+
+#mensaje.error {
+    display: block;
+    background: #f8d7da;
+    color: #721c24;
+    border: 1px solid #f5c6cb;
+}
+
+/* ============================================
+   LAYOUT PRINCIPAL (dos columnas)
+   ============================================ */
+
+body {
+    max-width: none;
+    margin: 0;
+    padding: 0;
+}
+
+#pantallaLogin {
+    min-height: 100vh;
+}
+
+.barra-herramientas {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    background: #ffffff;
+    padding: 12px 25px;
+    border-bottom: 1px solid #e2e8f0;
+}
+
+.barra-herramientas button {
+    margin: 0;
+}
+
+.barra-herramientas h3 {
+    margin: 0;
+    flex: 1;
+    text-align: center;
+    color: #2d1b4e;
+    font-size: 18px;
+}
+
+.btn-icono {
+    margin: 0;
+    width: 44px;
+    height: 44px;
+    border: none;
+    border-radius: 8px;
+    background: #f0f2f5;
+    color: #2d1b4e;
+    font-size: 16px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.btn-icono:hover {
+    background: #e2e8f0;
+}
+
+.barra-navegacion .btn-icono {
+    background: rgba(255, 255, 255, 0.15);
+    color: white;
+}
+
+.barra-navegacion .btn-icono:hover {
+    background: rgba(255, 255, 255, 0.3);
+}
+
+input.barra-buscar {
+    width: 220px;
+    margin: 0;
+    padding: 8px 14px;
+    border: 1px solid #e2e8f0;
+    border-radius: 20px;
+    font-size: 14px;
+}
+
+.contenido-app {
+    display: flex;
+    gap: 25px;
+    padding: 25px;
+    align-items: flex-start;
+}
+
+#panelIzquierdo {
+    width: 400px;
+    flex-shrink: 0;
+}
+
+#panelDerecho {
+    flex: 1;
+    min-width: 0;
+}
+
+.panel-cabecera {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 15px;
+}
+
+.panel-cabecera #crearBtn {
+    margin: 0;
+    flex: 1;
+    padding: 12px 16px;
+    border-radius: 8px;
+}
+
+.panel-cabecera #exportarBtn {
+    margin: 0;
+    width: 44px;
+    height: 44px;
+    border-radius: 8px;
+    font-size: 16px;
+    padding: 0;
+}
+
+.cabecera-calendario {
+    justify-content: flex-end;
+}
+
+/* ============================================
+   VISTA DIA: LINEA DE HORAS
+   ============================================ */
+
+.linea-horas {
+    display: flex;
+    flex-direction: column;
+}
+
+.fila-hora {
+    display: flex;
+    border-bottom: 1px solid #e2e8f0;
+    min-height: 48px;
+}
+
+.hora {
+    width: 55px;
+    text-align: right;
+    padding-right: 10px;
+    padding-top: 6px;
+    font-size: 11px;
+    color: #666;
+    flex-shrink: 0;
+}
+
+.celda-hora {
+    flex: 1;
+    border-left: 1px solid #e2e8f0;
+    padding: 2px 4px;
+    min-height: 48px;
+}
+
+.evento-dia {
+    background: #8b5cf6;
+    color: white;
+    border-left: 4px solid #2d1b4e;
+    border-radius: 6px;
+    padding: 4px 8px;
+    margin: 2px 0;
+    font-size: 12px;
+}
