@@ -94,14 +94,18 @@ function crearEvento(nuevoEvento) {
   return fetch('https://www.googleapis.com/calendar/v3/calendars/primary/events', {
     method: 'POST',
     headers: {
-      'Authorization': `Bearer ${AppState.accessToken}`,
+      'Authorization': `Bearer ${token}`,
       'Content-Type': 'application/json'
     },
     body: JSON.stringify(nuevoEvento)
   })
     .then(res => res.json().then(data => ({ status: res.status, data })))
     .then(({ status, data }) => {
-      if (status !== 200) {
+        if (status === 401) {
+          sesionExpirada();
+          throw new Error('Sesión expirada');
+        }
+        if (status !== 200) {
         console.log('ERROR DE GOOGLE (crear):', data);
         throw new Error(JSON.stringify(data));
       }
@@ -117,7 +121,31 @@ const btnCancelar = document.getElementById('btnCancelar');
 const modalTitulo = document.getElementById('modalTitulo');
 const btnModalCrear = document.getElementById('btnModalCrear');
 
+const campoFechaInicio = document.getElementById('campoFechaInicio');
+const campoHoraInicio = document.getElementById('campoHoraInicio');
+const campoFechaFinal = document.getElementById('campoFechaFinal');
+const campoHoraFinal = document.getElementById('campoHoraFinal');
+const errorFormulario = document.getElementById('errorFormulario');
+
 let eventoEnEdicion = null;
+
+// Marca visualmente que la fecha/hora final no puede ir antes de la inicial.
+function actualizarLimitesFecha() {
+  campoFechaFinal.min = campoFechaInicio.value;
+
+  const mismaFecha = campoFechaFinal.value && campoFechaFinal.value === campoFechaInicio.value;
+  campoHoraFinal.min = mismaFecha ? campoHoraInicio.value : '';
+}
+
+function mostrarErrorFormulario(texto) {
+  errorFormulario.textContent = texto;
+  errorFormulario.style.display = 'block';
+}
+
+function ocultarErrorFormulario() {
+  errorFormulario.textContent = '';
+  errorFormulario.style.display = 'none';
+}
 
 function cerrarModalCrear() {
   modalCrear.classList.remove('abierto');
@@ -125,6 +153,7 @@ function cerrarModalCrear() {
   eventoEnEdicion = null;
   modalTitulo.textContent = 'Crear Evento';
   btnModalCrear.textContent = 'Crear Evento';
+  ocultarErrorFormulario();
 }
 
 function abrirModalCrear() {
@@ -132,6 +161,8 @@ function abrirModalCrear() {
   modalTitulo.textContent = 'Crear Evento';
   btnModalCrear.textContent = 'Crear Evento';
   formCrearEvento.reset();
+  ocultarErrorFormulario();
+  actualizarLimitesFecha();
   modalCrear.classList.add('abierto');
 }
 
@@ -145,14 +176,20 @@ function abrirModalEditar(evento) {
 
   document.getElementById('campoTitulo').value = evento.titulo;
   document.getElementById('campoDescripcion').value = evento.descripcion;
-  document.getElementById('campoFechaInicio').value = fechaInicio;
-  document.getElementById('campoHoraInicio').value = horaInicio ? horaInicio.substring(0, 5) : '';
-  document.getElementById('campoFechaFinal').value = fechaFinal;
-  document.getElementById('campoHoraFinal').value = horaFinal ? horaFinal.substring(0, 5) : '';
+  campoFechaInicio.value = fechaInicio;
+  campoHoraInicio.value = horaInicio ? horaInicio.substring(0, 5) : '';
+  campoFechaFinal.value = fechaFinal;
+  campoHoraFinal.value = horaFinal ? horaFinal.substring(0, 5) : '';
   document.getElementById('campoTipo').value = evento.tipo;
 
+  ocultarErrorFormulario();
+  actualizarLimitesFecha();
   modalCrear.classList.add('abierto');
 }
+
+campoFechaInicio.addEventListener('input', actualizarLimitesFecha);
+campoHoraInicio.addEventListener('input', actualizarLimitesFecha);
+campoFechaFinal.addEventListener('input', actualizarLimitesFecha);
 
 crearBtn.addEventListener('click', abrirModalCrear);
 
@@ -165,24 +202,39 @@ formCrearEvento.addEventListener('submit', (e) => {
   e.preventDefault();
 
   const titulo = document.getElementById('campoTitulo').value.trim();
-  if (!titulo) return;
+  if (!titulo) {
+    mostrarErrorFormulario('El título no puede estar vacío.');
+    return;
+  }
 
   const descripcion = document.getElementById('campoDescripcion').value.trim();
-  const fechaInicio = document.getElementById('campoFechaInicio').value;
-  const horaInicio = document.getElementById('campoHoraInicio').value;
-  const fechaFinal = document.getElementById('campoFechaFinal').value;
-  const horaFinal = document.getElementById('campoHoraFinal').value;
+  const fechaInicio = campoFechaInicio.value;
+  const horaInicio = campoHoraInicio.value;
+  const fechaFinal = campoFechaFinal.value;
+  const horaFinal = campoHoraFinal.value;
   const tipo = document.getElementById('campoTipo').value;
+
+  const inicio = fechaInicio + 'T' + horaInicio;
+  const fin = fechaFinal + 'T' + horaFinal;
+  if (fin < inicio) {
+    mostrarErrorFormulario('La fecha final no puede ser anterior a la de inicio.');
+    return;
+  }
+
+  ocultarErrorFormulario();
 
   const datosEvento = {
     summary: titulo,
     description: descripcion,
-    start: { dateTime: `${fechaInicio}T${horaInicio}:00-05:00` },
-    end: { dateTime: `${fechaFinal}T${horaFinal}:00-05:00` },
+    start: { dateTime: `${inicio}:00-05:00` },
+    end: { dateTime: `${fin}:00-05:00` },
     extendedProperties: {
       private: { tipo }
     }
   };
+
+  // Evita que el doble clic en "Guardar" duplique el evento
+  btnModalCrear.disabled = true;
 
   const guardar = eventoEnEdicion
     ? editarEvento(eventoEnEdicion.id, datosEvento)
@@ -193,7 +245,10 @@ formCrearEvento.addEventListener('submit', (e) => {
       renderizarEventos();
       cerrarModalCrear();
     })
-    .catch(err => mostrarSalida('Error: ' + err));
+    .catch(err => mostrarSalida('Error: ' + err))
+    .finally(() => {
+      btnModalCrear.disabled = false;
+    });
 });
 
 // --------------------------------------------
@@ -216,6 +271,10 @@ function editarEvento(eventoId, cambios) {
   })
     .then(res => res.json().then(data => ({ status: res.status, data })))
     .then(({ status, data }) => {
+    if (status === 401) {
+        sesionExpirada();
+        throw new Error('Sesión expirada');
+      }
       if (status !== 200) {
         console.log('ERROR DE GOOGLE (editar):', data);
         throw new Error(JSON.stringify(data));
@@ -238,13 +297,29 @@ function eliminarEvento(eventoId) {
 
   return fetch(`https://www.googleapis.com/calendar/v3/calendars/primary/events/${eventoId}`, {
     method: 'DELETE',
-    headers: { 'Authorization': `Bearer ${AppState.accessToken}` }
+    headers: { 'Authorization': `Bearer ${token}` }
   })
     .then(res => {
+      if (res.status === 401) {
+        sesionExpirada();
+        throw new Error('Sesión expirada');
+      }
       if (res.status === 204 || res.ok) {
         eliminarEventoDeCache(eventoId);
         return true;
       }
       throw new Error('Status: ' + res.status);
     });
+}
+
+function sesionExpirada() {
+  mostrarSalida('Tu sesión ha expirado. Por favor, inicia sesión de nuevo.');
+  
+  localStorage.removeItem('gea_token');
+  AppState.accessToken = null;
+
+  document.getElementById('loginButton').style.display = 'inline-block';
+  document.getElementById('logoutBtn').style.display = 'none';
+  document.getElementById('crearBtn').style.display = 'none';
+  document.getElementById('calendarBotones').style.display = '';
 }
