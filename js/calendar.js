@@ -94,14 +94,18 @@ function crearEvento(nuevoEvento) {
   return fetch('https://www.googleapis.com/calendar/v3/calendars/primary/events', {
     method: 'POST',
     headers: {
-      'Authorization': `Bearer ${AppState.accessToken}`,
+      'Authorization': `Bearer ${token}`,
       'Content-Type': 'application/json'
     },
     body: JSON.stringify(nuevoEvento)
   })
     .then(res => res.json().then(data => ({ status: res.status, data })))
     .then(({ status, data }) => {
-      if (status !== 200) {
+        if (status === 401) {
+          sesionExpirada();
+          throw new Error('Sesión expirada');
+        }
+        if (status !== 200) {
         console.log('ERROR DE GOOGLE (crear):', data);
         throw new Error(JSON.stringify(data));
       }
@@ -267,6 +271,10 @@ function editarEvento(eventoId, cambios) {
   })
     .then(res => res.json().then(data => ({ status: res.status, data })))
     .then(({ status, data }) => {
+    if (status === 401) {
+        sesionExpirada();
+        throw new Error('Sesión expirada');
+      }
       if (status !== 200) {
         console.log('ERROR DE GOOGLE (editar):', data);
         throw new Error(JSON.stringify(data));
@@ -289,13 +297,29 @@ function eliminarEvento(eventoId) {
 
   return fetch(`https://www.googleapis.com/calendar/v3/calendars/primary/events/${eventoId}`, {
     method: 'DELETE',
-    headers: { 'Authorization': `Bearer ${AppState.accessToken}` }
+    headers: { 'Authorization': `Bearer ${token}` }
   })
     .then(res => {
+      if (res.status === 401) {
+        sesionExpirada();
+        throw new Error('Sesión expirada');
+      }
       if (res.status === 204 || res.ok) {
         eliminarEventoDeCache(eventoId);
         return true;
       }
       throw new Error('Status: ' + res.status);
     });
+}
+
+function sesionExpirada() {
+  mostrarSalida('Tu sesión ha expirado. Por favor, inicia sesión de nuevo.');
+  
+  localStorage.removeItem('gea_token');
+  AppState.accessToken = null;
+
+  document.getElementById('loginButton').style.display = 'inline-block';
+  document.getElementById('logoutBtn').style.display = 'none';
+  document.getElementById('crearBtn').style.display = 'none';
+  document.getElementById('calendarBotones').style.display = '';
 }
