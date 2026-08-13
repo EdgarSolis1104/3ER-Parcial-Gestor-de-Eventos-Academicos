@@ -16,34 +16,26 @@ const resultadoDiv = document.getElementById('resultado');
 const calendarBotones = document.getElementById('calendarBotones');
 const logoutBtn = document.getElementById('logoutBtn');
 
-   const tokenGuardado = localStorage.getItem('accessToken');
-    if (tokenGuardado) {
-      AppState.accessToken = tokenGuardado;
-      calendarBotones.style.display = 'block';
-      loginButton.style.display = 'none';
+// NOTA: el bloque que antes vivía aquí (leer 'accessToken' de localStorage
+// y restaurar la sesión apenas se cargaba este archivo) se movió a
+// ui.js -> iniciarApp() / restaurarSesion(). Tenerlo en dos lugares
+// era la causa de que se disparara la verificación de sesión dos veces
+// al recargar la página (Issue 2 de la revisión de ayer).
+function obtenerTokenValido() {
+  const dato = localStorage.getItem('gea_token');
+  if (!dato) return null;
+ 
+  const tokenGuardado = JSON.parse(dato);
+ 
+  // Date.now() da la hora actual en milisegundos. Si ya pasamos
+  // la marca de expira_en, el token ya no sirve aunque siga ahí.
+  if (Date.now() >= tokenGuardado.expira_en) {
+    localStorage.removeItem('gea_token');
+    return null;
+  }
+ 
+  return tokenGuardado.access_token;
 }
-  fetch('https://www.googleapis.com/oauth2/v1/userinfo?alt=json', {
-    headers: { 'Authorization': `Bearer ${tokenGuardado}` }
-  })
-    .then(res => {
-      if (!res.ok) throw new Error('Token expirado');
-      return res.json();
-    })
-    .then(data => {
-      resultadoDiv.style.display = 'block';
-      resultadoDiv.innerHTML = `
-        <img src="${data.picture}" alt="avatar">
-        <strong>${data.name}</strong><br>
-        ${data.email}
-      `;
-      calendarBotones.style.display = 'block';
-      loginButton.style.display = 'none';
-    })
-    .catch(() => {
-      localStorage.removeItem('accessToken');
-      AppState.accessToken = null;
-      calendarBotones.style.display = 'none';
-    });
 
 loginButton.addEventListener('click', () => {
   google.accounts.oauth2.initTokenClient({
@@ -53,59 +45,41 @@ loginButton.addEventListener('click', () => {
       if (response.error) {
         resultadoDiv.style.display = 'block';
         resultadoDiv.innerHTML = `<p>Error: ${response.error}</p>`;
-      } else {
-        AppState.accessToken = response.access_token;
-        localStorage.setItem('accessToken', response.access_token);
-
-        fetch('https://www.googleapis.com/oauth2/v1/userinfo?alt=json', {
-          headers: {
-            'Authorization': `Bearer ${response.access_token}`
-          }
-        }).then(res => res.json()).then(data => {
-          resultadoDiv.style.display = 'block';
-          resultadoDiv.innerHTML = `
-            <img src="${data.picture}" alt="avatar">
-            <strong>${data.name}</strong><br>
-            ${data.email}
-          `;
-
-          // Ya que hay token, mostramos los botones de Calendar
-          calendarBotones.style.display = 'block';
-
-          // Login exitoso -> listar eventos automáticamente
-          listarEventos()
-            .then(eventos => {
-              mostrarSalida('Eventos:\n' + JSON.stringify(eventos, null, 2));
-              renderizarEventos();
-            })
-            .catch(err => mostrarSalida('Error: ' + err));
-          loginButton.style.display = 'none';
-        });
+        return;
       }
+
+      AppState.accessToken = response.access_token;
+      const expira_en = Date.now() + response.expires_in * 1000;
+      localStorage.setItem('gea_token', JSON.stringify({
+        access_token: response.access_token,
+        expira_en
+      }));
+      fetch('https://www.googleapis.com/oauth2/v1/userinfo?alt=json', {
+        headers: {
+          'Authorization': `Bearer ${response.access_token}`
+        }
+      })
+        .then(res => res.json())
+        .then(datosUsuario => {
+          // Reutilizamos las funciones de ui.js en vez de repetir
+          // el innerHTML y los display aquí también.
+          mostrarPantallaApp(datosUsuario);
+          cargarEventosIniciales();
+        });
     },
   }).requestAccessToken({ prompt: 'consent' });
+  // NOTA: forzar 'consent' siempre es parte de lo que corrige el
+  // Issue 2 (evitar pantallas de permiso innecesarias).
 });
+
 logoutBtn.addEventListener('click', () => {
-  console.log('boton presionado');
-  
   const token = AppState.accessToken;
-  console.log('token es:', token);
-
-  if (!token) {
-    console.log('no hay token, saliendo');
-    return;
-  }
-
-  console.log('voy a llamar a revoke');
+  if (!token) return;
 
   google.accounts.oauth2.revoke(token, () => {
-    console.log('revoke termino, limpiando todo');
-    localStorage.removeItem('accessToken');
+    localStorage.removeItem('gea_token');
     AppState.accessToken = null;
-    resultadoDiv.style.display = 'none';
-    resultadoDiv.innerHTML = '';
-    calendarBotones.style.display = 'none';
-    loginButton.style.display = 'block';
-    console.log('listo, todo limpio');
+    mostrarPantallaLogin();
+    limpiarEventos();
   });
 });
