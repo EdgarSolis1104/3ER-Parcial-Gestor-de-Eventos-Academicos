@@ -135,4 +135,16 @@ window.addEventListener('storage', (evento) => {
     mostrarPantallaLogin();
   }
 });
+// NUEVO: revisa cada 2 segundos si la sesión sigue existiendo en localStorage.
+// Esto es un respaldo por si el evento 'storage' de arriba no se dispara
+// rápido (por ejemplo si la pestaña está en segundo plano). Así, aunque
+// eso pase, esta pestaña se da cuenta sola en máximo 2 segundos, sin
+// necesidad de recargar la página.
+setInterval(() => {
+  // Si esta pestaña cree que hay sesión activa, pero ya no hay token
+  // guardado en localStorage, es porque se cerró sesión en otra pestaña
+  if (AppState.accessToken && !localStorage.getItem('gea_token')) {
+    AppState.accessToken = null;
+    mostrarPantallaLogin();
+}, 2000);
 
