@@ -146,5 +146,6 @@ setInterval(() => {
   if (AppState.accessToken && !localStorage.getItem('gea_token')) {
     AppState.accessToken = null;
     mostrarPantallaLogin();
+  }
 }, 2000);
 
