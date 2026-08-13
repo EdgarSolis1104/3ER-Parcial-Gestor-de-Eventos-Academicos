@@ -30,6 +30,7 @@ const logoutBtn = document.getElementById('logoutBtn');
           return res.json();
         })
         .then(data => {
+          console.log (data)
           resultadoDiv.style.display = 'block';
           resultadoDiv.innerHTML = `
             <img src="${data.picture}" alt="avatar">
