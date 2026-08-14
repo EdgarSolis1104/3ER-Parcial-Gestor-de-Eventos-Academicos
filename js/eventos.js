@@ -103,7 +103,7 @@ function confirmarEliminar() {
       mostrarSalida('Evento eliminado correctamente.');
       renderizarEventos();
     })
-    .catch(err => mostrarSalida('Error: ' + err));
+    .catch(err => mostrarSalida('' + err));
 }
 
 btnCancelarEliminar.addEventListener('click', cerrarModalEliminar);

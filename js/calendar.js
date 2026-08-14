@@ -43,6 +43,9 @@ function mapearEventoAEstandar(eventoGoogle) {
   const [fecha, horaConZona] = fechaHora.split('T');
   const hora = horaConZona ? horaConZona.substring(0, 5) : '';
 
+   const fechaHoraFin = eventoGoogle.end?.dateTime || eventoGoogle.end?.date || '';
+  const [fechaFin] = fechaHoraFin.split('T');
+
   return {
     id: eventoGoogle.id,
     titulo: eventoGoogle.summary || '(sin título)',
@@ -271,6 +274,14 @@ function editarEvento(eventoId, cambios) {
   })
     .then(res => res.json().then(data => ({ status: res.status, data })))
     .then(({ status, data }) => {
+    if (status === 410) {
+      eliminarEventoDeCache(eventoId);
+      throw new Error("evento no encontrado");
+    }
+    if (status === 404) {
+      eliminarEventoDeCache(eventoId);
+      throw new Error("Sesión ya no existe");
+    }
     if (status === 401) {
         sesionExpirada();
         throw new Error('Sesión expirada');
@@ -289,6 +300,7 @@ function editarEvento(eventoId, cambios) {
 // ELIMINAR EVENTO (DELETE)
 // --------------------------------------------
 function eliminarEvento(eventoId) {
+  console.log('Intentando eliminar evento con ID:', eventoId);
   const token = obtenerTokenValido();
   if (!token) {
     mostrarSalida('Tu sesión ya no es válida. Inicia sesión de nuevo.');
@@ -300,6 +312,15 @@ function eliminarEvento(eventoId) {
     headers: { 'Authorization': `Bearer ${token}` }
   })
     .then(res => {
+      if (res.status === 410) {
+       eliminarEventoDeCache(eventoId);
+        throw new Error("evento no encontrado");
+      }
+
+      if (res.status === 404) {
+        eliminarEventoDeCache(eventoId);
+        throw new Error("Sesión ya no existe");
+      }
       if (res.status === 401) {
         sesionExpirada();
         throw new Error('Sesión expirada');
