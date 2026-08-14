@@ -369,6 +369,7 @@ function iniciarApp() {
     }
     document.getElementById('btnVista' + nuevaVista.charAt(0).toUpperCase() + nuevaVista.slice(1)).classList.add('activa');
     pintarCalendario();
+    renderizarEventos();
   }
 
   document.getElementById('mesAnterior').addEventListener('click', navegarAtras);
