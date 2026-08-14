@@ -102,7 +102,7 @@ function iniciarApp() {
       })
       .catch(() => {
         // El token guardado ya no sirve: limpiamos todo y regresamos al login
-        localStorage.removeItem('gea_Token');
+        localStorage.removeItem('gea_token');
         AppState.accessToken = null;
         mostrarPantallaLogin();
       });
