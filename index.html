@@ -156,7 +156,15 @@
     <!-- Configuración local con el Client ID (no se sube al repo) -->
     <script src="config.js"></script>
     
-    <!-- Módulos de la app -->
+    <!-- Módulos de la app.
+      IMPORTANTE: este orden no es arbitrario, cada archivo usa algo
+         que el anterior ya definió:
+           auth.js     -> no depende de nadie, va primero
+           calendar.js -> usa obtenerTokenValido() y AppState (de auth.js)
+           eventos.js  -> usa leerCache() (de calendar.js)
+           ui.js       -> usa cosas de los tres anteriores, va al final
+         Si cambian este orden, la consola del navegador va a mostrar
+         errores tipo "X is not defined". -->
     <script src="js/auth.js"></script>
     <script src="js/calendar.js"></script>
     <script src="js/eventos.js"></script>
