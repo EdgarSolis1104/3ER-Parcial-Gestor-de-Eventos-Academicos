@@ -163,8 +163,9 @@ function iniciarApp() {
     var fecha = fechaString(anio, mes, dia);
     var fechaHoy = fechaString(new Date().getFullYear(), new Date().getMonth(), new Date().getDate());
     for (var i = 0; i < eventos.length; i++) {
+      var finEvento = eventos[i].fechaFin || eventos[i].fecha; 
       // Solo eventos de hoy o futuros, nunca de dias anteriores
-      if (eventos[i].fecha >= fechaHoy && eventos[i].fecha === fecha) {
+      if (eventos[i].fecha >= fechaHoy && fecha >= eventos[i].fecha && fecha <= finEvento) {
         resultado.push(eventos[i]);
       }
     }
