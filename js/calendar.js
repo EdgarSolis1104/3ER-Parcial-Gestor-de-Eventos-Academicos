@@ -114,6 +114,10 @@ function crearEvento(nuevoEvento) {
       }
       const eventoEstandar = mapearEventoAEstandar(data);
       actualizarEventoEnCache(eventoEstandar);
+      // NUEVO: si ya se exportó antes a Sheets, esto agenda una
+      // sincronización automática (con debounce). Si nunca se exportó,
+      // no hace nada.
+      sincronizarSheetsSiCorresponde();
       return eventoEstandar;
     });
 }
@@ -292,6 +296,8 @@ function editarEvento(eventoId, cambios) {
       }
       const eventoEstandar = mapearEventoAEstandar(data);
       actualizarEventoEnCache(eventoEstandar);
+      // NUEVO: dispara la sincronización automática con Sheets si corresponde.
+      sincronizarSheetsSiCorresponde();
       return eventoEstandar;
     });
 }
@@ -327,6 +333,8 @@ function eliminarEvento(eventoId) {
       }
       if (res.status === 204 || res.ok) {
         eliminarEventoDeCache(eventoId);
+        // NUEVO: dispara la sincronización automática con Sheets si corresponde.
+        sincronizarSheetsSiCorresponde();
         return true;
       }
       throw new Error('Status: ' + res.status);

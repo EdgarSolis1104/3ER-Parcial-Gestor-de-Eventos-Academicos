@@ -8,7 +8,8 @@ const SCOPES = [
   "https://www.googleapis.com/auth/userinfo.profile",
   "https://www.googleapis.com/auth/userinfo.email",
   "https://www.googleapis.com/auth/calendar.events",
-  "https://www.googleapis.com/auth/spreadsheets"
+  "https://www.googleapis.com/auth/spreadsheets",
+  "https://www.googleapis.com/auth/drive.metadata.readonly"
 ];
 
 const loginButton = document.getElementById('loginButton');
@@ -148,4 +149,3 @@ setInterval(() => {
     mostrarPantallaLogin();
   }
 }, 2000);
-
