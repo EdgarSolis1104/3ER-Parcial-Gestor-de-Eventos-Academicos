@@ -372,19 +372,17 @@ function iniciarApp() {
     }
   });
 
-  document.getElementById('exportarBtn').addEventListener('click', function () {
-    var eventos = leerCache();
-    var texto = 'Titulo,Fecha,Hora,Tipo\n';
-    for (var i = 0; i < eventos.length; i++) {
-      texto = texto + eventos[i].titulo + ',' + eventos[i].fecha + ',' + eventos[i].hora + ',' + eventos[i].tipo + '\n';
-    }
-
-    // Aqui iria el codigo real de Google Sheets API (en js/sheets.js).
-    // Ejemplo simple: descarga un archivo CSV que se abre en Google Sheets.
-    var enlace = document.createElement('a');
-    enlace.href = 'data:text/csv;charset=utf-8,' + encodeURIComponent(texto);
-    enlace.download = 'eventos.csv';
-    enlace.click();
-  });
-
+  var exportarBtn = document.getElementById('exportarBtn');
+exportarBtn.addEventListener('click', function () {
+  // Evita doble export por doble clic mientras la request está en vuelo
+  exportarBtn.disabled = true;
+  exportarEventosASheets()
+    .catch(function (err) {
+      // Los mensajes claros ya se muestran dentro de sheets.js
+      console.log('ERROR exportando a Sheets:', err);
+    })
+    .finally(function () {
+      exportarBtn.disabled = false;
+    });
+});
   cambiarVista('dia');
