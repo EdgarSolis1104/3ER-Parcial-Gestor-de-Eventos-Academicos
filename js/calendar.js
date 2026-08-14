@@ -43,6 +43,9 @@ function mapearEventoAEstandar(eventoGoogle) {
   const [fecha, horaConZona] = fechaHora.split('T');
   const hora = horaConZona ? horaConZona.substring(0, 5) : '';
 
+   const fechaHoraFin = eventoGoogle.end?.dateTime || eventoGoogle.end?.date || '';
+  const [fechaFin] = fechaHoraFin.split('T');
+
   return {
     id: eventoGoogle.id,
     titulo: eventoGoogle.summary || '(sin título)',
@@ -94,19 +97,27 @@ function crearEvento(nuevoEvento) {
   return fetch('https://www.googleapis.com/calendar/v3/calendars/primary/events', {
     method: 'POST',
     headers: {
-      'Authorization': `Bearer ${AppState.accessToken}`,
+      'Authorization': `Bearer ${token}`,
       'Content-Type': 'application/json'
     },
     body: JSON.stringify(nuevoEvento)
   })
     .then(res => res.json().then(data => ({ status: res.status, data })))
     .then(({ status, data }) => {
-      if (status !== 200) {
+        if (status === 401) {
+          sesionExpirada();
+          throw new Error('Sesión expirada');
+        }
+        if (status !== 200) {
         console.log('ERROR DE GOOGLE (crear):', data);
         throw new Error(JSON.stringify(data));
       }
       const eventoEstandar = mapearEventoAEstandar(data);
       actualizarEventoEnCache(eventoEstandar);
+      // NUEVO: si ya se exportó antes a Sheets, esto agenda una
+      // sincronización automática (con debounce). Si nunca se exportó,
+      // no hace nada.
+      sincronizarSheetsSiCorresponde();
       return eventoEstandar;
     });
 }
@@ -267,12 +278,26 @@ function editarEvento(eventoId, cambios) {
   })
     .then(res => res.json().then(data => ({ status: res.status, data })))
     .then(({ status, data }) => {
+    if (status === 410) {
+      eliminarEventoDeCache(eventoId);
+      throw new Error("evento no encontrado");
+    }
+    if (status === 404) {
+      eliminarEventoDeCache(eventoId);
+      throw new Error("Sesión ya no existe");
+    }
+    if (status === 401) {
+        sesionExpirada();
+        throw new Error('Sesión expirada');
+      }
       if (status !== 200) {
         console.log('ERROR DE GOOGLE (editar):', data);
         throw new Error(JSON.stringify(data));
       }
       const eventoEstandar = mapearEventoAEstandar(data);
       actualizarEventoEnCache(eventoEstandar);
+      // NUEVO: dispara la sincronización automática con Sheets si corresponde.
+      sincronizarSheetsSiCorresponde();
       return eventoEstandar;
     });
 }
@@ -281,6 +306,7 @@ function editarEvento(eventoId, cambios) {
 // ELIMINAR EVENTO (DELETE)
 // --------------------------------------------
 function eliminarEvento(eventoId) {
+  
   const token = obtenerTokenValido();
   if (!token) {
     mostrarSalida('Tu sesión ya no es válida. Inicia sesión de nuevo.');
@@ -289,13 +315,42 @@ function eliminarEvento(eventoId) {
 
   return fetch(`https://www.googleapis.com/calendar/v3/calendars/primary/events/${eventoId}`, {
     method: 'DELETE',
-    headers: { 'Authorization': `Bearer ${AppState.accessToken}` }
+    headers: { 'Authorization': `Bearer ${token}` }
   })
     .then(res => {
+      if (res.status === 410) {
+       eliminarEventoDeCache(eventoId);
+        throw new Error("evento no encontrado");
+      }
+
+      if (res.status === 404) {
+        eliminarEventoDeCache(eventoId);
+        throw new Error("Sesión ya no existe");
+      }
+      if (res.status === 401) {
+        sesionExpirada();
+        throw new Error('Sesión expirada');
+      }
       if (res.status === 204 || res.ok) {
         eliminarEventoDeCache(eventoId);
+        // NUEVO: dispara la sincronización automática con Sheets si corresponde.
+        sincronizarSheetsSiCorresponde();
         return true;
       }
       throw new Error('Status: ' + res.status);
     });
+}
+
+function sesionExpirada() {
+  mostrarSalida('Tu sesión ha expirado. Por favor, inicia sesión de nuevo.');
+  
+  localStorage.removeItem('gea_token');
+  AppState.accessToken = null;
+
+  mostrarPantallaLogin();
+
+  document.getElementById('loginButton').style.display = 'flex';
+  document.getElementById('logoutBtn').style.display = 'none';
+  document.getElementById('crearBtn').style.display = 'none';
+  document.getElementById('calendarBotones').style.display = '';
 }

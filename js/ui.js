@@ -7,6 +7,47 @@
 // y CUÁNDO, llamando a las funciones que esos archivos ya exponen.
 // ============================================
 
+// --------------------------------------------
+// verificarDependencias()
+// Parámetros: ninguno
+// Antes de arrancar la app, confirma que las funciones y variables
+// que ui.js necesita de auth.js, calendar.js y eventos.js ya existen.
+// Si el orden de los <script> en index.html se llegara a romper
+// (por ejemplo, en un conflicto de Git mal resuelto), esta función
+// avisa con un mensaje claro, en vez de dejar que el navegador
+// truene con un error críptico y el usuario se quede viendo una
+// página que no reacciona a nada.
+//
+// Usamos "typeof algo === 'undefined'" en vez de revisar si existe
+// directamente, porque typeof NUNCA truena, aunque "algo" no exista
+// para nada en ningún archivo. Comparar "algo === undefined" a secas
+// sí tronaría con un ReferenceError si "algo" no existe.
+// --------------------------------------------
+function verificarDependencias() {
+  const faltantes = [];
+ 
+  if (typeof AppState === 'undefined') faltantes.push('AppState (auth.js)');
+  if (typeof obtenerTokenValido === 'undefined') faltantes.push('obtenerTokenValido (auth.js)');
+  if (typeof loginButton === 'undefined') faltantes.push('loginButton (auth.js)');
+  if (typeof leerCache === 'undefined') faltantes.push('leerCache (calendar.js)');
+  if (typeof listarEventos === 'undefined') faltantes.push('listarEventos (calendar.js)');
+  if (typeof renderizarEventos === 'undefined') faltantes.push('renderizarEventos (eventos.js)');
+  if (typeof listaEventosEl === 'undefined') faltantes.push('listaEventosEl (eventos.js)');
+ 
+  if (faltantes.length > 0) {
+    console.error(
+      'GEA: la app no puede arrancar porque falta esto (revisa el orden de los <script> en index.html):\n- ' +
+      faltantes.join('\n- ')
+    );
+    document.body.innerHTML =
+      '<p style="padding:40px;font-family:sans-serif;color:#b91c1c;">' +
+      'Algo no cargó correctamente. Abre la consola (F12 o Cmd+Opt+C) para ver el detalle, ' +
+      'y avisa al equipo de Arquitectura.</p>';
+    return false;
+  }
+ 
+  return true;
+}
 
 // --------------------------------------------
 // iniciarApp()
@@ -21,7 +62,7 @@ function iniciarApp() {
     // Esto evita que el usuario le dé clic mientras la app todavía
     // está revisando si ya había sesión (una de las causas del bug
     // de doble solicitud de token que vamos a corregir en el Issue 2).
-    loginButton.style.display = 'none';
+    loginButton.style.display = 'flex';
   
     const token = obtenerTokenValido();
     // NOTA para cuando resolvamos el Issue 1: esta línea va a cambiar
@@ -48,7 +89,7 @@ function iniciarApp() {
     document.getElementById('usuarioLogueado').textContent = '';
     document.getElementById('avatarUsuario').style.display = 'none';
     logoutBtn.style.display = 'none';
-    loginButton.style.display = 'block';
+    loginButton.style.display = 'flex';
     calendarBotones.style.display = 'none';
     resultadoDiv.style.display = 'none';
     resultadoDiv.innerHTML = '';
@@ -102,7 +143,7 @@ function iniciarApp() {
       })
       .catch(() => {
         // El token guardado ya no sirve: limpiamos todo y regresamos al login
-        localStorage.removeItem('gea_Token');
+        localStorage.removeItem('gea_token');
         AppState.accessToken = null;
         mostrarPantallaLogin();
       });
@@ -163,8 +204,9 @@ function iniciarApp() {
     var fecha = fechaString(anio, mes, dia);
     var fechaHoy = fechaString(new Date().getFullYear(), new Date().getMonth(), new Date().getDate());
     for (var i = 0; i < eventos.length; i++) {
+      var finEvento = eventos[i].fechaFin || eventos[i].fecha; 
       // Solo eventos de hoy o futuros, nunca de dias anteriores
-      if (eventos[i].fecha >= fechaHoy && eventos[i].fecha === fecha) {
+      if (eventos[i].fecha >= fechaHoy && fecha >= eventos[i].fecha && fecha <= finEvento) {
         resultado.push(eventos[i]);
       }
     }
@@ -371,19 +413,17 @@ function iniciarApp() {
     }
   });
 
-  document.getElementById('exportarBtn').addEventListener('click', function () {
-    var eventos = leerCache();
-    var texto = 'Titulo,Fecha,Hora,Tipo\n';
-    for (var i = 0; i < eventos.length; i++) {
-      texto = texto + eventos[i].titulo + ',' + eventos[i].fecha + ',' + eventos[i].hora + ',' + eventos[i].tipo + '\n';
-    }
-
-    // Aqui iria el codigo real de Google Sheets API (en js/sheets.js).
-    // Ejemplo simple: descarga un archivo CSV que se abre en Google Sheets.
-    var enlace = document.createElement('a');
-    enlace.href = 'data:text/csv;charset=utf-8,' + encodeURIComponent(texto);
-    enlace.download = 'eventos.csv';
-    enlace.click();
-  });
-
+  var exportarBtn = document.getElementById('exportarBtn');
+exportarBtn.addEventListener('click', function () {
+  // Evita doble export por doble clic mientras la request está en vuelo
+  exportarBtn.disabled = true;
+  exportarEventosASheets()
+    .catch(function (err) {
+      // Los mensajes claros ya se muestran dentro de sheets.js
+      console.log('ERROR exportando a Sheets:', err);
+    })
+    .finally(function () {
+      exportarBtn.disabled = false;
+    });
+});
   cambiarVista('dia');
