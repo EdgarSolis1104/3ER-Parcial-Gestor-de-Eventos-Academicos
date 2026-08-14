@@ -478,9 +478,11 @@ textarea {
 }
 
 #btnHoy {
-    border-radius: 8px !important;
-    width: auto !important;
-    padding: 0 12px;
+    border-radius: 8px;
+    width: auto;
+    height: auto;
+    padding: 8px 14px;
+    font-size: 13px;
     font-weight: bold;
 }
 
