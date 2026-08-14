@@ -339,7 +339,9 @@ function sesionExpirada() {
   localStorage.removeItem('gea_token');
   AppState.accessToken = null;
 
-  document.getElementById('loginButton').style.display = 'inline-block';
+  mostrarPantallaLogin();
+
+  document.getElementById('loginButton').style.display = 'flex';
   document.getElementById('logoutBtn').style.display = 'none';
   document.getElementById('crearBtn').style.display = 'none';
   document.getElementById('calendarBotones').style.display = '';

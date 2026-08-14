@@ -21,7 +21,7 @@ function iniciarApp() {
     // Esto evita que el usuario le dé clic mientras la app todavía
     // está revisando si ya había sesión (una de las causas del bug
     // de doble solicitud de token que vamos a corregir en el Issue 2).
-    loginButton.style.display = 'none';
+    loginButton.style.display = 'flex';
   
     const token = obtenerTokenValido();
     // NOTA para cuando resolvamos el Issue 1: esta línea va a cambiar
@@ -48,7 +48,7 @@ function iniciarApp() {
     document.getElementById('usuarioLogueado').textContent = '';
     document.getElementById('avatarUsuario').style.display = 'none';
     logoutBtn.style.display = 'none';
-    loginButton.style.display = 'block';
+    loginButton.style.display = 'flex';
     calendarBotones.style.display = 'none';
     resultadoDiv.style.display = 'none';
     resultadoDiv.innerHTML = '';
