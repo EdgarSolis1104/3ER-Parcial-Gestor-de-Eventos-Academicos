@@ -7,6 +7,47 @@
 // y CUÁNDO, llamando a las funciones que esos archivos ya exponen.
 // ============================================
 
+// --------------------------------------------
+// verificarDependencias()
+// Parámetros: ninguno
+// Antes de arrancar la app, confirma que las funciones y variables
+// que ui.js necesita de auth.js, calendar.js y eventos.js ya existen.
+// Si el orden de los <script> en index.html se llegara a romper
+// (por ejemplo, en un conflicto de Git mal resuelto), esta función
+// avisa con un mensaje claro, en vez de dejar que el navegador
+// truene con un error críptico y el usuario se quede viendo una
+// página que no reacciona a nada.
+//
+// Usamos "typeof algo === 'undefined'" en vez de revisar si existe
+// directamente, porque typeof NUNCA truena, aunque "algo" no exista
+// para nada en ningún archivo. Comparar "algo === undefined" a secas
+// sí tronaría con un ReferenceError si "algo" no existe.
+// --------------------------------------------
+function verificarDependencias() {
+  const faltantes = [];
+ 
+  if (typeof AppState === 'undefined') faltantes.push('AppState (auth.js)');
+  if (typeof obtenerTokenValido === 'undefined') faltantes.push('obtenerTokenValido (auth.js)');
+  if (typeof loginButton === 'undefined') faltantes.push('loginButton (auth.js)');
+  if (typeof leerCache === 'undefined') faltantes.push('leerCache (calendar.js)');
+  if (typeof listarEventos === 'undefined') faltantes.push('listarEventos (calendar.js)');
+  if (typeof renderizarEventos === 'undefined') faltantes.push('renderizarEventos (eventos.js)');
+  if (typeof listaEventosEl === 'undefined') faltantes.push('listaEventosEl (eventos.js)');
+ 
+  if (faltantes.length > 0) {
+    console.error(
+      'GEA: la app no puede arrancar porque falta esto (revisa el orden de los <script> en index.html):\n- ' +
+      faltantes.join('\n- ')
+    );
+    document.body.innerHTML =
+      '<p style="padding:40px;font-family:sans-serif;color:#b91c1c;">' +
+      'Algo no cargó correctamente. Abre la consola (F12 o Cmd+Opt+C) para ver el detalle, ' +
+      'y avisa al equipo de Arquitectura.</p>';
+    return false;
+  }
+ 
+  return true;
+}
 
 // --------------------------------------------
 // iniciarApp()
