@@ -300,7 +300,7 @@ function editarEvento(eventoId, cambios) {
 // ELIMINAR EVENTO (DELETE)
 // --------------------------------------------
 function eliminarEvento(eventoId) {
-  console.log('Intentando eliminar evento con ID:', eventoId);
+  
   const token = obtenerTokenValido();
   if (!token) {
     mostrarSalida('Tu sesión ya no es válida. Inicia sesión de nuevo.');
